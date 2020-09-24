@@ -10,8 +10,8 @@ import com.example.service.DboService
 
 @Component
 class DboServiceImpl @Autowired constructor(
-   val bankService: BankService,
-   val accountService: AccountService
+   private val bankService: BankService,
+   private val accountService: AccountService
 ): DboService {
     override fun transferMoney(fromClient: Client, toClient: Client, amount: Money) {
         val fromAccount = accountService.getDefaultAccount(fromClient)

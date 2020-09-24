@@ -13,10 +13,10 @@ class BankServiceImpl @Autowired constructor(
         validateTransfer(fromAccount, amount)
 
         fromAccount.amount -= amount
-        toAccount += amount
+        toAccount.amount += amount
     }
 
-    private fun validateTransfer(fromAccount: Account, amount: Money){
-        TODO()
+    private fun validateTransfer(fromAccount: Account, amount: Money) {
+        assert(fromAccount.amount >= amount)
     }
 }

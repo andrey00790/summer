@@ -1,27 +1,21 @@
 package com.example.context.support
 
 import com.example.beans.config.Config
-import com.example.beans.factory.annotation.Benchmark
 import com.example.beans.factory.impl.BeanFactory
-import com.example.beans.factory.impl.DefaultBeanFactory
 import com.example.beans.prepare.PrepareProcessors
 import org.reflections.Reflections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import kotlin.reflect.KClass
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.findAnnotation
 
 class GenericApplicationApplicationContext(private val config: Config) : ApplicationContextAware {
     private val beans: ConcurrentMap<String, Any> = ConcurrentHashMap()
     private val scanner: Reflections = Reflections(config.packagesToScan())
-    private val beanFactory: BeanFactory = createBeanFactory(config)
+    private val beanFactory = resolveImpl(BeanFactory::class).constructors.first().call(this)
 
     init {
         processPrepareContext()
     }
-
-
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> getBean(clazz: KClass<T>): T =
@@ -34,14 +28,6 @@ class GenericApplicationApplicationContext(private val config: Config) : Applica
                 beanFactory.createBean(clazz)
                     .also { beans[clazz.simpleName] = it }
             }
-
-    private fun createBeanFactory(
-        config: Config,
-    ): BeanFactory =
-        DefaultBeanFactory(
-            config,
-            scanner
-        )
 
     private fun <T : Any> findBean(type: KClass<T>): T? =
         beans[resolveImpl(type).simpleName] as T?
